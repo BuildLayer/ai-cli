@@ -2,7 +2,7 @@
 
 > A powerful command-line tool for creating AI-powered chat applications with React and TypeScript
 
-[![npm version](https://badge.fury.io/js/@buildlayer%2Fai-cli.svg)](https://badge.fury.io/js/@buildlayer%2Fai-cli)
+[![npm version](https://img.shields.io/npm/v/@buildlayer/ai-cli.svg)](https://www.npmjs.com/package/@buildlayer/ai-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Quick Start

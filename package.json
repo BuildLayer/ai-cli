@@ -1,6 +1,6 @@
 {
   "name": "@buildlayer/ai-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Command-line interface for AI UI SDK development and scaffolding",
   "keywords": [
     "ai",
