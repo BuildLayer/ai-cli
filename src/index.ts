@@ -1,4 +1,4 @@
 // CLI package exports
-export { createProject } from "./commands/create.ts";
-export { buildProject } from "./commands/build.ts";
-export { testProject } from "./commands/test.ts";
+export { createProject } from "./commands/create";
+export { buildProject } from "./commands/build";
+export { testProject } from "./commands/test";
