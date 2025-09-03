@@ -313,9 +313,9 @@ yarn add -D tailwindcss postcss autoprefixer
 
 ### Getting Help
 
-- [Documentation](https://github.com/buildlayer/ai-ui-sdk)
-- [Report Issues](https://github.com/buildlayer/ai-ui-sdk/issues)
-- [Discussions](https://github.com/buildlayer/ai-ui-sdk/discussions)
+- [Documentation](https://github.com/buildlayer/ai-cli)
+- [Report Issues](https://github.com/buildlayer/ai-cli/issues)
+- [Discussions](https://github.com/buildlayer/ai-cli/discussions)
 
 ## Contributing
 
@@ -324,7 +324,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### Development Setup
 
 ```bash
-git clone https://github.com/buildlayer/ai-ui-sdk.git
+git clone https://github.com/buildlayer/ai-cli.git
 cd cli
 
 # npm
