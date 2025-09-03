@@ -352,10 +352,10 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - [OpenAI](https://openai.com/) - AI API
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 - [Tetherai](https://github.com/nbursa/tetherai) - AI provider abstraction
-  - [@tetherai/openai](https://github.com/nbursa/tetherai/tree/main/packages/openai) - OpenAI provider
-  - [@tetherai/anthropic](https://github.com/nbursa/tetherai/tree/main/packages/anthropic) - Anthropic provider
-  - [@tetherai/mistral](https://github.com/nbursa/tetherai/tree/main/packages/mistral) - Mistral provider
-  - [@tetherai/grok](https://github.com/nbursa/tetherai/tree/main/packages/grok) - Grok provider
-  - [@tetherai/local](https://github.com/nbursa/tetherai/tree/main/packages/local) - Local LLM provider
+  - [@tetherai/openai](https://github.com/nbursa/TetherAI/tree/main/packages/provider/openai) - OpenAI provider
+  - [@tetherai/anthropic](https://github.com/nbursa/TetherAI/tree/main/packages/provider/anthropic) - Anthropic provider
+  - [@tetherai/mistral](https://github.com/nbursa/TetherAI/tree/main/packages/provider/mistral) - Mistral provider
+  - [@tetherai/grok](https://github.com/nbursa/TetherAI/tree/main/packages/provider/grok) - Grok provider
+  - [@tetherai/local](https://github.com/nbursa/TetherAI/tree/main/packages/provider/local) - Local LLM provider
 
 ## Made with ❤️ by the BuildLayer.dev team
