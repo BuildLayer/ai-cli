@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { createBasicTemplate } from "../templates/basic.ts";
+import { createBasicTemplate } from "../templates/basic";
 import { basename } from "path";
 
 export interface CreateOptions {
@@ -15,7 +15,7 @@ export interface CreateOptions {
 }
 
 export async function createProject(options: CreateOptions): Promise<void> {
-  console.log(chalk.blue("🚀 Creating new AI UI SDK project...\n"));
+  console.log(chalk.blue("Creating new AI UI SDK project...\n"));
 
   let projectName: string;
   let template: string;
@@ -61,6 +61,7 @@ export async function createProject(options: CreateOptions): Promise<void> {
         choices: [
           { name: "Basic React App", value: "basic" },
           // { name: "Next.js App", value: "nextjs" }
+          // { name: "Vue.js App", value: "vue" }
         ],
         default: options.template || "basic",
       },
@@ -110,7 +111,7 @@ export async function createProject(options: CreateOptions): Promise<void> {
       throw new Error(`Unknown template: ${template}`);
   }
 
-  console.log(chalk.green("\n🎉 Project created successfully!"));
+  console.log(chalk.green("\nProject created successfully!"));
   console.log(chalk.blue("\nNext steps:"));
   console.log(chalk.white(`  cd ${projectName}`));
   console.log(chalk.white("  npm install"));

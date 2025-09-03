@@ -2,9 +2,9 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { createProject } from "./commands/create.ts";
-import { buildProject } from "./commands/build.ts";
-import { testProject } from "./commands/test.ts";
+import { createProject } from "./commands/create";
+import { buildProject } from "./commands/build";
+import { testProject } from "./commands/test";
 
 const program = new Command();
 
