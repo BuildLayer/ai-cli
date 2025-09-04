@@ -1,10 +1,22 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { createBasicTemplate } from "../templates/basic";
+import { execSync } from "child_process";
+import { join } from "path";
 import { basename } from "path";
+import { nextjsTemplates } from "../templates/nextjs";
+import { reactTemplates } from "../templates/react";
+import { createBasicTemplate } from "../templates/basic";
+import { createMinimalTemplate } from "../templates/minimal";
+import { createExpressTemplate } from "../templates/express";
+import { createFullstackTemplate } from "../templates/fullstack";
+import {
+  updatePackageJson,
+  reinstallDependencies,
+} from "../utils/packageManager";
+import { createFile, createDirectory } from "../utils/fileManager";
 
 export interface CreateOptions {
-  template?: string;
+  preset?: string;
   directory?: string;
   projectName?: string;
   useTypeScript?: boolean;
@@ -12,33 +24,129 @@ export interface CreateOptions {
   skipPrompts?: boolean;
   typescript?: boolean;
   tailwind?: boolean;
+  database?: string;
+  auth?: string;
+  deploy?: string;
 }
+
+// Define available presets
+const PRESETS = {
+  minimal: {
+    name: "Minimal (AI Core Only)",
+    description: "Console-based AI chat with @buildlayer/ai-core only",
+    command: "", // Custom template creation
+    postInstall: async (projectDir: string, options: any) => {
+      // Template creation is handled in createProject function
+    },
+  },
+  basic: {
+    name: "Basic React + Vite",
+    description: "Self-contained React app with AI chat UI",
+    command: "", // Custom template creation
+    postInstall: async (projectDir: string, options: any) => {
+      // Template creation is handled in createProject function
+    },
+  },
+  react: {
+    name: "React + Vite (Full Featured)",
+    description: "Complete React app with routing and AI components",
+    command:
+      "npm create vite@latest {projectName} -- --template {template} --yes",
+    postInstall: async (projectDir: string, options: any) => {
+      updatePackageJson(projectDir, { ...options, preset: "react" });
+      reinstallDependencies(projectDir);
+      createFile(join(projectDir, "src", "App.tsx"), reactTemplates.app);
+      createFile(
+        join(projectDir, "src", "index.css"),
+        reactTemplates.indexCss(options.useTailwind)
+      );
+      if (options.useTailwind) {
+        createFile(
+          join(projectDir, "postcss.config.mjs"),
+          reactTemplates.postcssConfig
+        );
+      }
+    },
+  },
+  nextjs: {
+    name: "Next.js",
+    description: "Next.js app with SSR and AI chat",
+    command:
+      "npx create-next-app@latest {projectName} --typescript --tailwind --eslint --app --src-dir --import-alias '@/*' --yes",
+    postInstall: async (projectDir: string, options: any) => {
+      updatePackageJson(projectDir, { ...options, preset: "nextjs" });
+      reinstallDependencies(projectDir);
+      createFile(
+        join(projectDir, "src", "app", "page.tsx"),
+        nextjsTemplates.page
+      );
+      createFile(
+        join(projectDir, "src", "app", "globals.css"),
+        nextjsTemplates.globalsCss(options.useTailwind)
+      );
+      if (options.useTailwind) {
+        createFile(
+          join(projectDir, "postcss.config.mjs"),
+          nextjsTemplates.postcssConfig
+        );
+      }
+      createDirectory(join(projectDir, "src", "app", "components"));
+      createFile(
+        join(projectDir, "src", "app", "components", "AIChatApp.tsx"),
+        nextjsTemplates.aiChatApp
+      );
+      createFile(
+        join(projectDir, "src", "app", "layout.tsx"),
+        nextjsTemplates.layout
+      );
+    },
+  },
+  express: {
+    name: "Express.js API",
+    description: "Backend API server with AI chat endpoints",
+    command: "", // Custom template creation
+    postInstall: async (projectDir: string, options: any) => {
+      // Template creation is handled in createProject function
+    },
+  },
+  fullstack: {
+    name: "Full-Stack (Next.js + Database)",
+    description: "Complete full-stack app with authentication and database",
+    command: "", // Custom template creation
+    postInstall: async (projectDir: string, options: any) => {
+      // Template creation is handled in createProject function
+    },
+  },
+};
 
 export async function createProject(options: CreateOptions): Promise<void> {
   console.log(chalk.blue("Creating new AI UI SDK project...\n"));
 
   let projectName: string;
-  let template: string;
+  let preset: string;
   let useTypeScript: boolean;
   let useTailwind: boolean;
 
   if (options.skipPrompts) {
     // Use provided options directly for testing
-    projectName = options.projectName || "test-project";
-    template = options.template || "basic";
-    useTypeScript = options.useTypeScript ?? true;
-    useTailwind = options.useTailwind ?? true;
+    projectName =
+      options.projectName ||
+      (options.directory ? basename(options.directory) : "test-project");
+    preset = options.preset || "react";
+    useTypeScript = options.useTypeScript ?? options.typescript ?? true;
+    useTailwind = options.useTailwind ?? options.tailwind ?? true;
   } else if (
     options.typescript !== undefined ||
-    options.tailwind !== undefined
+    options.tailwind !== undefined ||
+    options.preset
   ) {
     // Use CLI options if provided
     projectName =
       options.projectName ||
       (options.directory ? basename(options.directory) : "ai-chat-app");
-    template = options.template || "basic";
-    useTypeScript = options.typescript ?? true;
-    useTailwind = options.tailwind ?? true;
+    preset = options.preset || "react";
+    useTypeScript = options.useTypeScript ?? options.typescript ?? true;
+    useTailwind = options.useTailwind ?? options.tailwind ?? true;
   } else {
     // Get project details from user prompts
     const answers = await inquirer.prompt([
@@ -56,64 +164,149 @@ export async function createProject(options: CreateOptions): Promise<void> {
       },
       {
         type: "list",
-        name: "template",
-        message: "Which template would you like to use?",
-        choices: [
-          { name: "Basic React App", value: "basic" },
-          // { name: "Next.js App", value: "nextjs" }
-          // { name: "Vue.js App", value: "vue" }
-        ],
-        default: options.template || "basic",
+        name: "preset",
+        message: "Which preset would you like to use?",
+        choices: Object.entries(PRESETS).map(([key, preset]) => ({
+          name: preset.name,
+          value: key,
+        })),
+        default: options.preset || "react",
       },
       {
         type: "confirm",
         name: "useTypeScript",
         message: "Would you like to use TypeScript?",
         default: true,
+        when: (answers) =>
+          !PRESETS[answers.preset as keyof typeof PRESETS]?.command.includes(
+            "--template react-ts"
+          ),
       },
       {
         type: "confirm",
         name: "useTailwind",
         message: "Would you like to use Tailwind CSS?",
         default: true,
+        when: (answers) =>
+          !PRESETS[answers.preset as keyof typeof PRESETS]?.command.includes(
+            "--tailwind"
+          ),
       },
     ]);
 
     projectName = answers.projectName;
-    template = answers.template;
-    useTypeScript = answers.useTypeScript;
-    useTailwind = answers.useTailwind;
+    preset = answers.preset;
+    useTypeScript = answers.useTypeScript ?? true;
+    useTailwind = answers.useTailwind ?? true;
   }
 
   console.log(chalk.yellow(`\nCreating project: ${projectName}`));
-  console.log(chalk.yellow(`Template: ${template}`));
+  console.log(
+    chalk.yellow(`Preset: ${PRESETS[preset as keyof typeof PRESETS]?.name}`)
+  );
   console.log(chalk.yellow(`TypeScript: ${useTypeScript ? "Yes" : "No"}`));
   console.log(chalk.yellow(`Tailwind CSS: ${useTailwind ? "Yes" : "No"}`));
 
-  // Create project based on template
-  switch (template) {
-    case "basic":
+  // Get preset configuration
+  const presetConfig = PRESETS[preset as keyof typeof PRESETS];
+  if (!presetConfig) {
+    throw new Error(`Unknown preset: ${preset}`);
+  }
+
+  // Create project directory
+  const projectDir = options.directory
+    ? options.directory.startsWith("/")
+      ? options.directory
+      : join(process.cwd(), options.directory)
+    : join(process.cwd(), projectName);
+
+  try {
+    // Handle custom template presets
+    if (preset === "minimal") {
+      await createMinimalTemplate(projectName, {
+        useTypeScript,
+        useTailwind,
+        directory: options.directory,
+      });
+    } else if (preset === "basic") {
       await createBasicTemplate(projectName, {
         useTypeScript,
         useTailwind,
         directory: options.directory,
       });
-      break;
-    case "nextjs":
-      // TODO: Implement Next.js template
-      console.log(chalk.yellow("Next.js template coming soon..."));
-      break;
-    case "vue":
-      // TODO: Implement Vue template
-      console.log(chalk.yellow("Vue template coming soon..."));
-      break;
-    default:
-      throw new Error(`Unknown template: ${template}`);
-  }
+    } else if (preset === "express") {
+      await createExpressTemplate(projectName, {
+        useTypeScript,
+        useTailwind,
+        directory: options.directory,
+      });
+    } else if (preset === "fullstack") {
+      await createFullstackTemplate(projectName, {
+        useTypeScript,
+        useTailwind,
+        directory: options.directory,
+        database: options.database || "sqlite",
+        auth: options.auth || "nextauth",
+      });
+    } else {
+      // Handle standard presets that use external CLI tools
+      let command = presetConfig.command
+        .replace("{projectName}", projectName)
+        .replace("{projectDir}", projectDir)
+        .replace("{typescript}", useTypeScript ? "-ts" : "")
+        .replace("{template}", useTypeScript ? "react-ts" : "react");
 
-  console.log(chalk.green("\nProject created successfully!"));
-  console.log(chalk.blue("\nNext steps:"));
-  console.log(chalk.white(`  cd ${projectName}`));
-  console.log(chalk.white("  npm install"));
-  console.log(chalk.white("  npm run dev"));
+      console.log(chalk.blue(`\nExecuting: ${command}`));
+
+      // Run the command
+      execSync(command, {
+        stdio: "inherit",
+        cwd: process.cwd(),
+      });
+
+      // Run post-install steps
+      console.log(
+        chalk.blue("\nAdding AI UI SDK dependencies and configuration...")
+      );
+      await presetConfig.postInstall(projectDir, {
+        useTypeScript,
+        useTailwind,
+      });
+    }
+
+    // Install dependencies with pnpm for custom templates
+    if (["minimal", "basic", "express", "fullstack"].includes(preset)) {
+      console.log(chalk.blue("\nInstalling dependencies with pnpm..."));
+      execSync("pnpm install", {
+        stdio: "inherit",
+        cwd: projectDir,
+      });
+    }
+
+    console.log(chalk.green("\nProject created successfully!"));
+    console.log(chalk.blue("\nNext steps:"));
+    console.log(chalk.white(`  cd ${projectName}`));
+
+    // Provide preset-specific instructions
+    if (preset === "minimal") {
+      console.log(
+        chalk.white("  # Configure your AI provider in src/index.ts")
+      );
+      console.log(chalk.white("  pnpm dev"));
+    } else if (preset === "express") {
+      console.log(chalk.white("  # Configure environment variables in .env"));
+      console.log(chalk.white("  pnpm dev"));
+    } else if (preset === "fullstack") {
+      console.log(
+        chalk.white("  # Configure environment variables in .env.local")
+      );
+      console.log(chalk.white("  pnpm db:push"));
+      console.log(chalk.white("  pnpm dev"));
+    } else {
+      console.log(chalk.white("  pnpm dev"));
+    }
+  } catch (error) {
+    console.error(chalk.red("Failed to create project:"), error);
+    throw error;
+  }
 }

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { writeFileSync, mkdirSync } from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
 
 interface TemplateOptions {
   useTypeScript: boolean;
@@ -14,39 +14,46 @@ export async function createBasicTemplate(
 ): Promise<void> {
   const { useTypeScript, useTailwind, directory } = options;
 
-  console.log(chalk.yellow("Creating basic React template..."));
-
   // Create project directory
-  const projectDir = join(directory || process.cwd(), projectName);
+  const baseDir = directory
+    ? directory.startsWith("/")
+      ? dirname(directory)
+      : process.cwd()
+    : process.cwd();
+  const projectDir = directory ? directory : join(baseDir, projectName);
   mkdirSync(projectDir, { recursive: true });
+
+  // Create src directory
+  const srcDir = join(projectDir, "src");
+  mkdirSync(srcDir, { recursive: true });
 
   // Create package.json
   const packageJson = {
     name: projectName,
-    version: "0.1.0",
     private: true,
+    version: "0.1.0",
+    type: "module",
     scripts: {
       dev: "vite",
-      build: "tsc && vite build",
+      build: useTypeScript ? "tsc && vite build" : "vite build",
       preview: "vite preview",
     },
     dependencies: {
-      "@buildlayer/ai-core": "latest",
-      "@buildlayer/ai-react": "latest",
-      react: "^18.0.0",
-      "react-dom": "^18.0.0",
+      "@buildlayer/ai-core": "^0.1.2",
+      "@buildlayer/ai-react": "^0.1.4",
+      react: "^18.3.1",
+      "react-dom": "^18.3.1",
+      "react-router-dom": "^6.30.1",
     },
     devDependencies: {
-      "@types/react": "^18.0.0",
-      "@types/react-dom": "^18.0.0",
-      "@vitejs/plugin-react": "^4.0.0",
-      typescript: "^5.4.0",
-      vite: "^5.0.0",
-      ...(useTailwind && {
-        autoprefixer: "^10.0.0",
-        postcss: "^8.0.0",
-        tailwindcss: "^3.0.0",
-      }),
+      "@types/react": "^18.3.24",
+      "@types/react-dom": "^18.3.7",
+      "@vitejs/plugin-react": "^4.7.0",
+      "@tailwindcss/postcss": "^4.1.12",
+      postcss: "^8.0.0",
+      tailwindcss: "^4.0.0",
+      typescript: "^5.9.2",
+      vite: "^5.4.19",
     },
   };
 
@@ -55,208 +62,206 @@ export async function createBasicTemplate(
     JSON.stringify(packageJson, null, 2)
   );
 
-  // Create Vite config
-  const viteConfig = `import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+  // Create vite.config.ts
+  const viteConfig = `import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: true
-  }
-});`;
+  },
+})`;
 
   writeFileSync(join(projectDir, "vite.config.ts"), viteConfig);
 
-  // Create TypeScript config
+  // Create tsconfig.json if TypeScript is enabled
   if (useTypeScript) {
-    const tsConfig = `{
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
-}`;
+    const tsConfig = {
+      compilerOptions: {
+        target: "ES2020",
+        useDefineForClassFields: true,
+        lib: ["ES2020", "DOM", "DOM.Iterable"],
+        module: "ESNext",
+        skipLibCheck: true,
+        moduleResolution: "bundler",
+        allowImportingTsExtensions: true,
+        resolveJsonModule: true,
+        isolatedModules: true,
+        noEmit: true,
+        jsx: "react-jsx",
+        strict: true,
+        noUnusedLocals: true,
+        noUnusedParameters: true,
+        noFallthroughCasesInSwitch: true,
+      },
+      include: ["src"],
+      references: [{ path: "./tsconfig.node.json" }],
+    };
 
-    writeFileSync(join(projectDir, "tsconfig.json"), tsConfig);
+    writeFileSync(
+      join(projectDir, "tsconfig.json"),
+      JSON.stringify(tsConfig, null, 2)
+    );
 
-    const tsConfigNode = `{
-  "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["vite.config.ts"]
-}`;
+    const tsConfigNode = {
+      compilerOptions: {
+        composite: true,
+        skipLibCheck: true,
+        module: "ESNext",
+        moduleResolution: "bundler",
+        allowSyntheticDefaultImports: true,
+      },
+      include: ["vite.config.ts"],
+    };
 
-    writeFileSync(join(projectDir, "tsconfig.node.json"), tsConfigNode);
+    writeFileSync(
+      join(projectDir, "tsconfig.node.json"),
+      JSON.stringify(tsConfigNode, null, 2)
+    );
   }
 
-  // Create Tailwind config
+  // Create tailwind.config.js if Tailwind is enabled
   if (useTailwind) {
-    const tailwindConfig = `/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}`;
-
-    writeFileSync(join(projectDir, "tailwind.config.js"), tailwindConfig);
-
     const postcssConfig = `export default {
   plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
+    '@tailwindcss/postcss': {},
   },
 }`;
 
     writeFileSync(join(projectDir, "postcss.config.js"), postcssConfig);
   }
 
-  // Create HTML entry point
-  const indexHtml = `<!DOCTYPE html>
+  // Create index.html
+  const indexHtml = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${projectName}</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.${useTypeScript ? "tsx" : "jsx"}"></script>
+    <script type="module" src="/src/main.${
+      useTypeScript ? "tsx" : "jsx"
+    }"></script>
   </body>
 </html>`;
 
   writeFileSync(join(projectDir, "index.html"), indexHtml);
 
-  // Create source directory
-  const srcDir = join(projectDir, "src");
-  mkdirSync(srcDir, { recursive: true });
+  // Create main.tsx/jsx
+  const mainFile = `import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.${useTypeScript ? "tsx" : "jsx"}'
+import './index.css'
 
-  // Create main entry point
-  const mainFile = `import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.${useTypeScript ? "tsx" : "jsx"}';
-${useTailwind ? "import './index.css';" : ""}
-
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-);`;
+)`;
 
   writeFileSync(
     join(srcDir, `main.${useTypeScript ? "tsx" : "jsx"}`),
     mainFile
   );
 
-  // Create App component
-  const appFile = `import React, { useState } from 'react';
-import { ChatPanel } from '@buildlayer/ai-react';
-import { ChatStore, OpenAIAdapter } from '@buildlayer/ai-core';
-
-function App() {
-  const [apiKey, setApiKey] = useState('');
-  const [chatStore, setChatStore] = useState(null);
-
-  const handleConnect = () => {
-    if (!apiKey.trim()) return;
-
-    const adapter = new OpenAIAdapter({ apiKey: apiKey.trim() });
-    const store = new ChatStore(adapter);
-    setChatStore(store);
-  };
-
-  if (!chatStore) {
-    return (
-      <div className="${useTailwind ? "min-h-screen bg-gray-50 flex items-center justify-center" : ""}">
-        <div className="${useTailwind ? "max-w-md w-full bg-white rounded-lg shadow-md p-6" : ""}">
-          <h1 className="${useTailwind ? "text-2xl font-bold text-gray-900 mb-4" : ""}">
-            AI Chat Assistant
-          </h1>
-          <p className="${useTailwind ? "text-gray-600 mb-4" : ""}">
-            Enter your OpenAI API key to start chatting
-          </p>
-          <div className="${useTailwind ? "space-y-4" : ""}">
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-..."
-              className="${useTailwind ? "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" : ""}"
-            />
-            <button
-              onClick={handleConnect}
-              disabled={!apiKey.trim()}
-              className="${useTailwind ? "w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed" : ""}"
-            >
-              Connect
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="${useTailwind ? "min-h-screen bg-gray-50" : ""}">
-      <div className="${useTailwind ? "max-w-4xl mx-auto h-screen flex flex-col" : ""}">
-        <header className="${useTailwind ? "bg-white border-b border-gray-200 px-6 py-4" : ""}">
-          <div className="${useTailwind ? "flex items-center justify-between" : ""}">
-            <h1 className="${useTailwind ? "text-xl font-semibold text-gray-900" : ""}">
-              AI Chat Assistant
-            </h1>
-            <button
-              onClick={() => setChatStore(null)}
-              className="${useTailwind ? "px-3 py-1 text-sm text-gray-600 hover:text-gray-900" : ""}"
-            >
-              Disconnect
-            </button>
-          </div>
-        </header>
-        
-        <main className="${useTailwind ? "flex-1 bg-white" : ""}">
-          <ChatPanel chatController={chatStore} />
-        </main>
-      </div>
-    </div>
-  );
-}
+  // Create App component using the actual App component from ai-react
+  const appFile = `import { App } from "@buildlayer/ai-react";
+import "./index.css";
 
 export default App;`;
 
   writeFileSync(join(srcDir, `App.${useTypeScript ? "tsx" : "jsx"}`), appFile);
 
-  // Create CSS file
-  if (useTailwind) {
-    const indexCss = `@tailwind base;
-@tailwind components;
-@tailwind utilities;`;
+  // Create CSS file - use ai-react CSS for proper theming
+  const indexCss = `@import "tailwindcss";
+@import "@buildlayer/ai-react/dist/style.css";`;
 
-    writeFileSync(join(srcDir, "index.css"), indexCss);
+  writeFileSync(join(srcDir, "index.css"), indexCss);
+
+  // Create .env file for environment variables
+  const envFile = `# OpenAI API Configuration
+# Add your OpenAI API key here to auto-connect
+VITE_OPENAI_API_KEY=your-openai-api-key
+
+# Other AI providers (uncomment to use)
+# VITE_ANTHROPIC_API_KEY=your-anthropic-api-key
+# VITE_MISTRAL_API_KEY=your-mistral-api-key
+# VITE_GROK_API_KEY=your-grok-api-key
+`;
+
+  writeFileSync(join(projectDir, ".env"), envFile);
+  writeFileSync(join(projectDir, ".env.example"), envFile);
+
+  // Create README
+  const readme = `# ${projectName}
+
+A basic React AI chat application using @buildlayer/ai-core and @buildlayer/ai-react.
+
+## Setup
+
+1. Install dependencies:
+   \`\`\`bash
+   pnpm install
+   \`\`\`
+
+2. Configure your AI provider (choose one method):
+
+   **Method 1: Environment Variable (Recommended)**
+   \`\`\`bash
+   # Edit .env file
+   VITE_OPENAI_API_KEY=your-openai-api-key
+   \`\`\`
+
+   **Method 2: Manual Entry**
+   - Start the app and enter your API key in the input field
+
+3. Run the application:
+   \`\`\`bash
+   pnpm dev
+   \`\`\`
+
+## Available Commands
+
+- \`pnpm dev\` - Start development server
+- \`pnpm build\` - Build for production${
+    useTypeScript ? "" : " (no-op for JavaScript)"
   }
+- \`pnpm preview\` - Preview built application
+
+## Features
+
+- 🤖 AI chat with multiple provider support
+- 🔑 API key management (environment variable or manual entry)
+- 🎨 Tailwind CSS styling${useTypeScript ? " (when enabled)" : ""}
+- ⚡ Vite for fast development
+- 🔄 Hot module replacement
+
+## Supported AI Providers
+
+- OpenAI (\`createOpenAIAdapter\`)
+- Anthropic (\`createAnthropicAdapter\`)
+- Mistral (\`createMistralAdapter\`)
+- Grok (\`createGrokAdapter\`)
+- Local LLM (\`createLocalLLMAdapter\`)
+
+## Environment Variables
+
+- \`VITE_OPENAI_API_KEY\` - OpenAI API key (auto-connects if set)
+- \`VITE_ANTHROPIC_API_KEY\` - Anthropic API key
+- \`VITE_MISTRAL_API_KEY\` - Mistral API key
+- \`VITE_GROK_API_KEY\` - Grok API key
+
+## License
+
+MIT
+`;
+
+  writeFileSync(join(projectDir, "README.md"), readme);
 
   console.log(chalk.green(`Basic template created in ${projectName}/`));
 }

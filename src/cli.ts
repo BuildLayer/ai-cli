@@ -11,20 +11,51 @@ const program = new Command();
 program
   .name("ai-cli")
   .description("AI UI SDK development and scaffolding CLI")
-  .version("0.1.0");
+  .version("0.1.2");
 
 program
   .command("create")
   .description("Create a new AI chat project")
-  .option("-t, --template <template>", "Project template to use", "basic")
-  .option("-d, --directory <directory>", "Project directory name")
-  .option("--typescript", "Use TypeScript", true)
-  .option("--no-typescript", "Don't use TypeScript")
-  .option("--tailwind", "Use Tailwind CSS", true)
-  .option("--no-tailwind", "Don't use Tailwind CSS")
-  .action(async (options) => {
+  .argument(
+    "[preset]",
+    "Project preset (minimal, basic, react, nextjs, express, fullstack)",
+    "react"
+  )
+  .argument("[directory]", "Project directory name")
+  .option("--no-typescript", "Don't use TypeScript (default: true)")
+  .option("--no-tailwind", "Don't use Tailwind CSS (default: true)")
+  .option(
+    "--database <type>",
+    "Database type (sqlite, postgres, mysql) - fullstack preset only",
+    "sqlite"
+  )
+  .option(
+    "--auth <provider>",
+    "Auth provider (nextauth, clerk, auth0) - fullstack preset only",
+    "nextauth"
+  )
+  .option(
+    "--deploy <platform>",
+    "Deploy target (vercel, netlify, railway)",
+    "vercel"
+  )
+  .action(async (preset, directory, options) => {
     try {
-      await createProject(options);
+      const createOptions = {
+        preset,
+        directory,
+        projectName: directory,
+        typescript: options.typescript,
+        tailwind: options.tailwind,
+        useTypeScript: options.typescript,
+        useTailwind: options.tailwind,
+        database: options.database,
+        auth: options.auth,
+        deploy: options.deploy,
+        skipPrompts: true,
+      };
+
+      await createProject(createOptions);
       console.log(chalk.green("Project created successfully!"));
     } catch (error) {
       console.error(chalk.red("Failed to create project:"), error);
