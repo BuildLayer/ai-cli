@@ -69,16 +69,12 @@ ai-cli create [preset] [directory] [options]
 - `minimal` - Console-based AI chat with @buildlayer/ai-core only
 - `basic` - Self-contained React app with AI chat UI
 - `react` - Complete React app with routing and AI components (default)
-- `nextjs` - Next.js app with SSR and AI chat
 - `express` - Backend API server with AI chat endpoints
-- `fullstack` - Complete full-stack app with authentication and database
 
 **Options:**
 
 - `--no-typescript` - Use JavaScript instead of TypeScript (default: TypeScript enabled)
 - `--no-tailwind` - Skip Tailwind CSS (default: Tailwind enabled)
-- `--database <type>` - Database type for fullstack preset (sqlite, postgres, mysql) [default: sqlite]
-- `--auth <provider>` - Auth provider for fullstack preset (nextauth, clerk, auth0) [default: nextauth]
 - `--deploy <platform>` - Deploy target (vercel, netlify, railway) [default: vercel]
 
 **Examples:**
@@ -93,14 +89,8 @@ ai-cli create minimal my-console-chat
 # Create JavaScript app without Tailwind
 ai-cli create basic my-js-app --no-typescript --no-tailwind
 
-# Create Next.js app
-ai-cli create nextjs my-nextjs-app
-
 # Create Express API server
 ai-cli create express my-api-server
-
-# Create full-stack app with PostgreSQL and NextAuth
-ai-cli create fullstack my-fullstack-app --database postgres --auth nextauth
 
 # Create in specific directory
 ai-cli create react my-chat-app --directory /path/to/projects
@@ -179,25 +169,6 @@ ai-cli create react my-chat-app
 - Keyboard shortcuts
 - TypeScript/JavaScript options
 
-### ⚡ Next.js
-
-Next.js application with server-side rendering and AI chat.
-
-**Best for:** SEO-friendly apps, server-side rendering, full-stack React
-
-```bash
-ai-cli create nextjs my-nextjs-app
-```
-
-**Features:**
-
-- Next.js 15 with App Router
-- Server-side rendering
-- @buildlayer/ai-react integration
-- Tailwind CSS
-- TypeScript support
-- API routes ready
-
 ### 🔧 Express
 
 Backend API server with AI chat endpoints and WebSocket support.
@@ -217,26 +188,6 @@ ai-cli create express my-api-server
 - Multiple AI provider support
 - Session management
 
-### 🏗️ Full-Stack
-
-Complete full-stack application with authentication and database.
-
-**Best for:** Production applications, user management, data persistence
-
-```bash
-ai-cli create fullstack my-fullstack-app
-```
-
-**Features:**
-
-- Next.js 15 frontend
-- Prisma ORM with database
-- NextAuth.js authentication
-- OAuth providers (Google, GitHub)
-- Chat session persistence
-- User management
-- TypeScript support
-
 ## What Gets Created
 
 ### Project Structure (React Example)
@@ -255,44 +206,20 @@ my-ai-chat-app/
 └── index.html           # HTML entry point
 ```
 
-### Full-Stack Project Structure
-
-```text
-my-fullstack-app/
-├── src/
-│   ├── app/             # Next.js App Router
-│   │   ├── page.tsx     # Main page
-│   │   ├── layout.tsx   # Root layout
-│   │   └── api/         # API routes
-│   ├── components/      # React components
-│   └── lib/             # Utilities
-├── prisma/
-│   └── schema.prisma    # Database schema
-├── package.json         # Dependencies
-├── next.config.js       # Next.js configuration
-├── tailwind.config.js   # Tailwind CSS
-└── .env.local          # Environment variables
-```
-
 ## Included Dependencies
 
 ### Core Dependencies
 
 - `@buildlayer/ai-core` - AI chat engine and store
-- `@buildlayer/ai-react` - React UI components (React/Next.js presets)
+- `@buildlayer/ai-react` - React UI components (React presets)
 
 ### Framework Dependencies
 
-**React/Next.js:**
+**React:**
 
 - `react` - React 18
 - `react-dom` - React DOM
 - `react-router-dom` - Client-side routing (React preset)
-
-**Next.js:**
-
-- `next` - Next.js 15
-- `@next-auth/prisma-adapter` - NextAuth database adapter (fullstack)
 
 **Express:**
 
@@ -300,11 +227,6 @@ my-fullstack-app/
 - `cors` - CORS middleware
 - `helmet` - Security middleware
 - `ws` - WebSocket support
-
-**Database (Full-Stack):**
-
-- `@prisma/client` - Database ORM
-- `prisma` - Database toolkit
 
 ### Development Dependencies
 
@@ -342,15 +264,6 @@ pnpm dev
 ```bash
 # Configure environment variables in .env
 # Add your API keys
-pnpm dev
-```
-
-**Full-Stack:**
-
-```bash
-# Configure environment variables in .env.local
-# Set up database
-pnpm db:push
 pnpm dev
 ```
 
@@ -430,28 +343,16 @@ PORT=3001
 NODE_ENV=development
 ```
 
-**Full-Stack:**
-
-```bash
-# .env.local
-DATABASE_URL="postgresql://username:password@localhost:5432/database"
-NEXTAUTH_SECRET=your-nextauth-secret
-NEXTAUTH_URL=http://localhost:3000
-OPENAI_API_KEY=your-openai-api-key
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-```
-
 ## Deployment
 
-### Vercel (Recommended for React/Next.js)
+### Vercel (Recommended for React)
 
 1. Push code to GitHub
 2. Connect to Vercel
 3. Configure environment variables
 4. Deploy
 
-### Railway (Express/Full-Stack)
+### Railway (Express)
 
 1. Connect GitHub repository
 2. Configure environment variables
@@ -481,13 +382,6 @@ pnpm install
 ```bash
 # Check TypeScript configuration
 pnpm tsc --noEmit
-```
-
-**Database Issues (Full-Stack):**
-
-```bash
-# Reset database
-pnpm db:push
 ```
 
 **Port Already in Use:**
@@ -527,12 +421,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Acknowledgments
 
 - [React](https://reactjs.org/) - UI library
-- [Next.js](https://nextjs.org/) - React framework
 - [Express](https://expressjs.com/) - Web framework
 - [Vite](https://vitejs.dev/) - Build tool
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [Prisma](https://prisma.io/) - Database ORM
-- [NextAuth.js](https://next-auth.js.org/) - Authentication
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 - [Tetherai](https://github.com/nbursa/tetherai) - AI provider abstraction
   - [@tetherai/openai](https://github.com/nbursa/TetherAI/tree/main/packages/provider/openai) - OpenAI provider

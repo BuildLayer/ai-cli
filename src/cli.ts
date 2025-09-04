@@ -18,27 +18,12 @@ program
   .description("Create a new AI chat project")
   .argument(
     "[preset]",
-    "Project preset (minimal, basic, react, nextjs, express, fullstack)",
+    "Project preset (minimal, basic, react, express)",
     "react"
   )
   .argument("[directory]", "Project directory name")
   .option("--no-typescript", "Don't use TypeScript (default: true)")
   .option("--no-tailwind", "Don't use Tailwind CSS (default: true)")
-  .option(
-    "--database <type>",
-    "Database type (sqlite, postgres, mysql) - fullstack preset only",
-    "sqlite"
-  )
-  .option(
-    "--auth <provider>",
-    "Auth provider (nextauth, clerk, auth0) - fullstack preset only",
-    "nextauth"
-  )
-  .option(
-    "--deploy <platform>",
-    "Deploy target (vercel, netlify, railway)",
-    "vercel"
-  )
   .action(async (preset, directory, options) => {
     try {
       const createOptions = {
@@ -49,9 +34,6 @@ program
         tailwind: options.tailwind,
         useTypeScript: options.typescript,
         useTailwind: options.tailwind,
-        database: options.database,
-        auth: options.auth,
-        deploy: options.deploy,
         skipPrompts: true,
       };
 

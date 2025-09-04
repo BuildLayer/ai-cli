@@ -3,12 +3,10 @@ import inquirer from "inquirer";
 import { execSync } from "child_process";
 import { join } from "path";
 import { basename } from "path";
-import { nextjsTemplates } from "../templates/nextjs";
 import { reactTemplates } from "../templates/react";
 import { createBasicTemplate } from "../templates/basic";
 import { createMinimalTemplate } from "../templates/minimal";
 import { createExpressTemplate } from "../templates/express";
-import { createFullstackTemplate } from "../templates/fullstack";
 import {
   updatePackageJson,
   reinstallDependencies,
@@ -24,9 +22,6 @@ export interface CreateOptions {
   skipPrompts?: boolean;
   typescript?: boolean;
   tailwind?: boolean;
-  database?: string;
-  auth?: string;
-  deploy?: string;
 }
 
 // Define available presets
@@ -68,50 +63,9 @@ const PRESETS = {
       }
     },
   },
-  nextjs: {
-    name: "Next.js",
-    description: "Next.js app with SSR and AI chat",
-    command:
-      "npx create-next-app@latest {projectName} --typescript --tailwind --eslint --app --src-dir --import-alias '@/*' --yes",
-    postInstall: async (projectDir: string, options: any) => {
-      updatePackageJson(projectDir, { ...options, preset: "nextjs" });
-      reinstallDependencies(projectDir);
-      createFile(
-        join(projectDir, "src", "app", "page.tsx"),
-        nextjsTemplates.page
-      );
-      createFile(
-        join(projectDir, "src", "app", "globals.css"),
-        nextjsTemplates.globalsCss(options.useTailwind)
-      );
-      if (options.useTailwind) {
-        createFile(
-          join(projectDir, "postcss.config.mjs"),
-          nextjsTemplates.postcssConfig
-        );
-      }
-      createDirectory(join(projectDir, "src", "app", "components"));
-      createFile(
-        join(projectDir, "src", "app", "components", "AIChatApp.tsx"),
-        nextjsTemplates.aiChatApp
-      );
-      createFile(
-        join(projectDir, "src", "app", "layout.tsx"),
-        nextjsTemplates.layout
-      );
-    },
-  },
   express: {
     name: "Express.js API",
     description: "Backend API server with AI chat endpoints",
-    command: "", // Custom template creation
-    postInstall: async (projectDir: string, options: any) => {
-      // Template creation is handled in createProject function
-    },
-  },
-  fullstack: {
-    name: "Full-Stack (Next.js + Database)",
-    description: "Complete full-stack app with authentication and database",
     command: "", // Custom template creation
     postInstall: async (projectDir: string, options: any) => {
       // Template creation is handled in createProject function
@@ -240,14 +194,6 @@ export async function createProject(options: CreateOptions): Promise<void> {
         useTailwind,
         directory: options.directory,
       });
-    } else if (preset === "fullstack") {
-      await createFullstackTemplate(projectName, {
-        useTypeScript,
-        useTailwind,
-        directory: options.directory,
-        database: options.database || "sqlite",
-        auth: options.auth || "nextauth",
-      });
     } else {
       // Handle standard presets that use external CLI tools
       let command = presetConfig.command
@@ -275,7 +221,7 @@ export async function createProject(options: CreateOptions): Promise<void> {
     }
 
     // Install dependencies with pnpm for custom templates
-    if (["minimal", "basic", "express", "fullstack"].includes(preset)) {
+    if (["minimal", "basic", "express"].includes(preset)) {
       console.log(chalk.blue("\nInstalling dependencies with pnpm..."));
       execSync("pnpm install", {
         stdio: "inherit",
@@ -295,12 +241,6 @@ export async function createProject(options: CreateOptions): Promise<void> {
       console.log(chalk.white("  pnpm dev"));
     } else if (preset === "express") {
       console.log(chalk.white("  # Configure environment variables in .env"));
-      console.log(chalk.white("  pnpm dev"));
-    } else if (preset === "fullstack") {
-      console.log(
-        chalk.white("  # Configure environment variables in .env.local")
-      );
-      console.log(chalk.white("  pnpm db:push"));
       console.log(chalk.white("  pnpm dev"));
     } else {
       console.log(chalk.white("  pnpm dev"));
