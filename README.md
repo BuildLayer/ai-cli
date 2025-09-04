@@ -80,9 +80,6 @@ ai-cli create [preset] [directory] [options]
 **Examples:**
 
 ```bash
-# Create React app with TypeScript and Tailwind (default)
-ai-cli create my-chat-app
-
 # Create minimal console app
 ai-cli create minimal my-console-chat
 
