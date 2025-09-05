@@ -1,6 +1,6 @@
 {
   "name": "@buildlayer/ai-cli",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Command-line interface for AI UI SDK development and scaffolding",
   "keywords": [
     "ai",
@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@buildlayer/ai-core": "^0.1.4",
-    "@buildlayer/ai-react": "^0.1.16",
+    "@buildlayer/ai-react": "^0.1.17",
     "commander": "^11.0.0",
     "chalk": "^5.0.0",
     "inquirer": "^9.0.0"
