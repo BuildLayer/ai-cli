@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@buildlayer/ai-core':
-        specifier: ^0.1.2
-        version: 0.1.2
-      '@buildlayer/ai-react':
         specifier: ^0.1.4
-        version: 0.1.4(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 0.1.4
+      '@buildlayer/ai-react':
+        specifier: ^0.1.16
+        version: 0.1.16(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       chalk:
         specifier: ^5.0.0
         version: 5.6.0
@@ -46,17 +46,12 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
-  '@buildlayer/ai-cli@0.1.2':
-    resolution: {integrity: sha512-P2odcsTdAmfql1RSy3RvcUftT81OJXdmHDETLEtMVJ2lmIjrIZzuc7kXwg3iC/EJkSvMzIHzE7UNBrXu6mdp0A==}
-    engines: {node: '>=18'}
-    hasBin: true
-
-  '@buildlayer/ai-core@0.1.2':
-    resolution: {integrity: sha512-lNx60xmkOpwNqT+rWbA0AUahKGmHJ1AcH+xMxcJi2b6Hj0VVNMlTWoMdbqc6jrTcZANEOOoGDfSMkpGjPyAGBA==}
+  '@buildlayer/ai-core@0.1.4':
+    resolution: {integrity: sha512-CQ0UNddTXvB/dL79Zh/z4LezFXAc/gNk54j2XK89fXGqSJ8NmgNlRbNbrgHoU8T/GHRMN0lbImCyJic4awuGfw==}
     engines: {node: '>=18'}
 
-  '@buildlayer/ai-react@0.1.4':
-    resolution: {integrity: sha512-KX7/IjQEgJtldp8zmbAzY8eH8TOhB4Dxs2hybriew3iPJwHeEGfLv/6ETBuf0qdYx0AD/WBDWj6bBq85+0IZUQ==}
+  '@buildlayer/ai-react@0.1.16':
+    resolution: {integrity: sha512-rPjFtXWEYapTsA89ib2FvpP0vCAbY5uwCIcffjx/hskxxu4PWWRS4elyOsulh43kmnmjt/YHWiNBiN6236gTuA==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18.0.0
@@ -1508,13 +1503,7 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
-  '@buildlayer/ai-cli@0.1.2':
-    dependencies:
-      chalk: 5.6.0
-      commander: 11.1.0
-      inquirer: 9.3.7
-
-  '@buildlayer/ai-core@0.1.2':
+  '@buildlayer/ai-core@0.1.4':
     dependencies:
       '@tetherai/anthropic': 0.4.1
       '@tetherai/grok': 0.4.1
@@ -1523,10 +1512,9 @@ snapshots:
       '@tetherai/openai': 0.4.1
       nanoid: 5.1.5
 
-  '@buildlayer/ai-react@0.1.4(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@buildlayer/ai-react@0.1.16(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@buildlayer/ai-cli': 0.1.2
-      '@buildlayer/ai-core': 0.1.2
+      '@buildlayer/ai-core': 0.1.4
       '@tailwindcss/postcss': 4.1.13
       clsx: 2.1.1
       postcss: 8.5.6
