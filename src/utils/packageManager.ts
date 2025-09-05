@@ -22,8 +22,8 @@ export function updatePackageJson(
   );
 
   // Add AI dependencies - jednostavno i direktno
-  packageJson.dependencies["@buildlayer/ai-core"] = "^0.1.2";
-  packageJson.dependencies["@buildlayer/ai-react"] = "^0.1.7";
+  packageJson.dependencies["@buildlayer/ai-core"] = "^0.1.3";
+  packageJson.dependencies["@buildlayer/ai-react"] = "^0.1.11";
   packageJson.dependencies["react-router-dom"] = "^6.8.0";
 
   // Override React version to be compatible with ai-react

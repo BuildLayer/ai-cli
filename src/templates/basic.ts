@@ -39,8 +39,8 @@ export async function createBasicTemplate(
       preview: "vite preview",
     },
     dependencies: {
-      "@buildlayer/ai-core": "^0.1.2",
-      "@buildlayer/ai-react": "^0.1.4",
+      "@buildlayer/ai-core": "^0.1.3",
+      "@buildlayer/ai-react": "^0.1.11",
       react: "^18.3.1",
       "react-dom": "^18.3.1",
       "react-router-dom": "^6.30.1",
