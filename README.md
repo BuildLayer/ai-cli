@@ -3,6 +3,7 @@
 > A powerful command-line tool for creating AI-powered chat applications with multiple frameworks and deployment options
 
 [![npm version](https://img.shields.io/npm/v/@buildlayer/ai-cli.svg)](https://www.npmjs.com/package/@buildlayer/ai-cli)
+![npm](https://img.shields.io/npm/dw/@buildlayer/ai-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Quick Start
